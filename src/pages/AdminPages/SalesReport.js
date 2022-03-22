@@ -5,100 +5,52 @@ import Axios from 'axios';
 import { API_URL } from '../../helper';
 
 
-const SalesReport = () => {
-
-    const userGlobal = useSelector((state) => state.userGlobal);
-
-    const [salesFetch, setSalesFetch] = useState({
-        salesDataList: []
-    });
-
-    const [revenueFetch, setRevenueFetch] = useState({
-        revenueData: {}
-    });
-
-    const fetchSales = () => {
-        Axios.get(`${API_URL}/admin`)
-            .then((res) => {
-                if (res.data.length) {
-                    setSalesFetch({ ...salesFetch, salesDataList: res.data });
-                }
-            })
-            .catch((err) => {
-                console.log(err);
-            });
-    };
-
-    const fetchRevenue = () => {
-        Axios.get(`${API_URL}/admin/revenue`)
-            .then((res) => {
-                if (res.data.length) {
-                    setRevenueFetch({ ...revenueFetch, revenueData: res.data[0] });
-                }
-            })
-            .catch((err) => {
-                console.log(err);
-            });
-    };
-
-    const renderReports = () => {
-        let salesDataList = [...salesFetch.salesDataList];
-
-        return salesDataList.map((val) => {
-            return (
-                <tr>
-                    <td>{val.Date}</td>
-                    <td>{val.nama_produk}</td>
-                    <td>{val.qty}</td>
-                    <td>Rp. {val.harga_jual}</td>
-                </tr>
-            )
-        })
+class SalesReport extends React.Component {
+    constructor(props) {
+        super(props);
     }
-
-    const renderRevenue = () => {
-        let revenueData = revenueFetch.revenueData;
+    state = {}
+    render() {
         return (
-            <tr>
-                <td><strong>Revenue</strong></td>
-                <td></td>
-                <td></td>
-                <td>Rp. {revenueData.Revenue}</td>
-            </tr>
-        )
-    }
-
-    useEffect(() => {
-        fetchSales();
-        fetchRevenue();
-    }, []);
-
-
-    return (
-        <div className="container p-5r">
-            <div className="col-12 text-center">
-                <h1>Sales Report</h1>
-                <div className="row">
-                    <table className="table mt-6">
-                        <thead>
-                            <tr>
-                                <th>Date</th>
-                                <th>nama_produk</th>
-                                <th>Qty</th>
-                                <th>harga_jual</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {renderReports()}
-                        </tbody>
-                        <tfoot>
-                            {renderRevenue()}
-                        </tfoot>
-                    </table>
+            <div className="p-4" style={{ fontFamily: "poppins", fontSize: "15px" }}>
+                <h2 className="text-center" style={{ fontWeight: "bolder" }}>Sales Report</h2>
+                <div className="row shadow p-2 mt-5 pb-3 bg-white rounded m-auto" style={{ width: "65%" }}>
+                    <div className='shadow col-md-3 mt-3 rounded m-auto' style={{ height: "200px", width: "300px" }}>
+                        <h4 style={{ fontWeight: "bolder" }}>Number of Sales</h4>
+                        <hr className="my-3" style={{ width: "100%" }} />
+                        <h3>-</h3>
+                    </div>
+                    <div className='shadow col-md-3 mt-3 rounded m-auto' style={{ height: "200px", width: "300px" }}>
+                        <h4 style={{ fontWeight: "bolder" }}>Revenue</h4>
+                        <hr className="my-3" style={{ width: "100%" }} />
+                        <h3>Rp. -</h3>
+                    </div>
+                    <div className='shadow col-md-3 mt-3 rounded m-auto' style={{ height: "200px", width: "300px" }}>
+                        <h4 style={{ fontWeight: "bolder" }}>Profit</h4>
+                        <hr className="my-3" style={{ width: "100%" }} />
+                        <h3>Rp. -</h3>
+                    </div>
+                    <div className='shadow col-md-3 mt-3 rounded m-auto' style={{ height: "200px", width: "300px" }}>
+                        <h4 style={{ fontWeight: "bolder" }}>Cost</h4>
+                        <hr className="my-3" style={{ width: "100%" }} />
+                        <h3>Rp. -</h3>
+                    </div>
+                    <div className='shadow col-md-7 mt-3 rounded m-auto' style={{ height: "200px", width: "65%" }}>
+                        <h4 style={{ fontWeight: "bolder" }}>Sales Revenue</h4>
+                        <hr className="my-3" style={{ width: "100%" }} />
+                    </div>
+                    <div className='shadow col-md-5 mt-3 rounded m-auto' style={{ height: "200px", width: "30%" }}>
+                        <h4 style={{ fontWeight: "bolder" }}>Cost Breakdown</h4>
+                        <hr className="my-3" style={{ width: "100%" }} />
+                        <h5>Marketing</h5>
+                        <h5>Rp. -</h5>
+                        <h5>Sales</h5>
+                        <h5>Rp. -</h5>
+                    </div>
                 </div>
             </div>
-        </div>
-    );
-};
+        );
+    }
+}
 
 export default SalesReport;

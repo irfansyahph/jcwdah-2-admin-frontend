@@ -32,6 +32,7 @@ class ProductAdmin extends React.Component {
     getProducts = () => {
         axios.get(`${API_URL}/products/get`)
             .then((res) => {
+                console.table(res.data)
                 this.setState({ products: res.data })
             }).catch((err) => {
                 console.log(err)
@@ -39,36 +40,19 @@ class ProductAdmin extends React.Component {
     }
 
     printProducts = () => {
-        let { products, imgIndex, productIndex } = this.state
-
+        let { products } = this.state
         return products.map((value, index) => {
             return <tr className='text-center' style={{ width: "20vw" }}>
                 <th>{index + 1}</th>
                 <td className="text-center" style={{ width: "10vw" }}>
-                    {
-                        productIndex == index ?
-                            <img src={value.images[imgIndex].url} width="100%" alt={value.namaproduk} />
-                            :
-                            <img src={value.images[0].url} width="100%" alt={value.namaproduk} />
-
-                    }
-                    {/* <div className="pt-2">
-                        {
-                            value.images.map((val, idx) => {
-                                return <img className="px-1" style={{ cursor: "pointer" }} src={val.url} width="15%" alt={value.namaproduk + idx}
-                                    onClick={() => this.setState({ imgIndex: idx, productIndex: index })}
-                                />
-                            })
-                        }
-                    </div> */}
+                    <img src={value.galeri_produk} alt={value.nama_produk} style={{ width: "100%" }} />
                 </td>
-                <td>{value.kategori_id}</td>
-                <td>{value.nama_produk}</td>
-                <td style={{ width: "25vw" }}>{value.deskripsi_produk}</td>
-                <td>IDR. {value.harga_modal.toLocaleString()}</td>
-                <td>IDR. {value.harga_jual.toLocaleString()}</td>
-                <td>{value.jumlah_stok.toLocaleString()}</td>
-                <td>{value.gudang_id}</td>
+                <td style={{ width: "10%" }}>{value.kategori}</td>
+                <td style={{ width: "10%" }}>{value.nama_produk}</td>
+                <td style={{ width: "20%" }}>{value.deskripsi_produk}</td>
+                <td>{value.harga_modal}</td>
+                <td>{value.harga_jual}</td>
+                <td>{value.stok[0].total_stok}</td>
                 <td>
                     <Button type="button" color="warning" onClick={() => this.btEdit(index)}>Edit</Button>
                     <Button type="button" color="danger" outline onClick={() => this.btDelete(value.produk_id)}>Delete</Button>
@@ -90,18 +74,18 @@ class ProductAdmin extends React.Component {
         this.setState({ modalEdit: !this.state.modalEdit, selectedIndex: index })
     }
 
-    printImagesForm = () => {
-        return this.state.images.map((value, index) => {
-            return <Input type="text" placeholder={`Image-${index + 1}`}
-                onChange={(e) => this.handleImages(e, index)} />
-        })
-    }
+    // printImagesForm = () => {
+    //     return this.state.images.map((value, index) => {
+    //         return <Input type="text" placeholder={`Image-${index + 1}`}
+    //             onChange={(e) => this.handleImages(e, index)} />
+    //     })
+    // }
 
-    handleImages = (e, index) => {
-        let temp = this.state.images
-        temp[index] = e.target.value
-        this.setState({ images: temp })
-    }
+    // handleImages = (e, index) => {
+    //     let temp = this.state.images
+    //     temp[index] = e.target.value
+    //     this.setState({ images: temp })
+    // }
 
     printImagesEdit = () => {
         return this.state.products[this.state.selectedIndex].images.map((value, index) => {
@@ -118,34 +102,29 @@ class ProductAdmin extends React.Component {
     }
 
     btSaveEdit = () => {
-        let { products, selectedIndex, imagesEdit, modalEdit } = this.state
-        console.log("gambar edit", imagesEdit)
-
+        let { products, selectedIndex, modalEdit } = this.state
+        console.log(products[selectedIndex])
         let produk_id = products[selectedIndex].produk_id
-        let kategori_id = this.refs.editKategoriid.value
         let nama_produk = this.refs.editNamaproduk.value
+        let kategori = this.refs.editKategoriid.value
         let deskripsi_produk = this.refs.editDeskripsiproduk.value
         let harga_modal = parseInt(this.refs.editHargamodal.value)
         let harga_jual = parseInt(this.refs.editHargajual.value)
-        let jumlah_stok = parseInt(this.refs.editJumlahstok.value)
-        let gudang_id = this.refs.editGudangid.value
-        let images = imagesEdit.length > 0 ? imagesEdit : products[selectedIndex].images
 
-
-        axios.patch(`${API_URL}/products/update`, {
-            produk_id, kategori_id, nama_produk, deskripsi_produk, harga_modal, harga_jual, jumlah_stok, gudang_id, images
+        axios.patch(`${API_URL}/products/edit`, {
+            produk_id, nama_produk, kategori, deskripsi_produk, harga_modal, harga_jual
         })
             .then((res) => {
                 this.getProducts()
-                this.setState({ selectedIndex: null, imagesEdit: [], modalEdit: !modalEdit })
+                this.setState({ selectedIndex: null, modalEdit: !modalEdit })
             }).catch((err) => {
                 console.log(err)
             })
     }
 
     btAddProduct = () => {
-        let kategori_id = this.refs.kategoriid.value
         let nama_produk = this.refs.namaproduk.value
+        let kategori = this.refs.kategoriid.value
         let deskripsi_produk = this.refs.deskripsiproduk.value
         let harga_modal = parseInt(this.refs.hargamodal.value)
         let harga_jual = parseInt(this.refs.hargajual.value)
@@ -153,9 +132,9 @@ class ProductAdmin extends React.Component {
         let gudang_id = this.refs.gudangid.value
         let images = this.state.images
 
-        console.log(kategori_id, nama_produk, deskripsi_produk, harga_modal, harga_jual, jumlah_stok, gudang_id, images)
+        console.log(kategori, nama_produk, deskripsi_produk, harga_modal, harga_jual, jumlah_stok, gudang_id, images)
 
-        if (kategori_id == "" || nama_produk == "" || deskripsi_produk == "" || harga_modal == "" || harga_jual == "" || jumlah_stok == "" || gudang_id == "") {
+        if (kategori == "" || nama_produk == "" || deskripsi_produk == "" || harga_modal == "" || harga_jual == "" || jumlah_stok == "" || gudang_id == "") {
             alert("Fill in form ❌")
         } else {
             if (isNaN(harga_modal) || isNaN(harga_jual)) {
@@ -163,13 +142,13 @@ class ProductAdmin extends React.Component {
             } else {
                 let formData = new FormData()
                 let data = {
-                    kategori_id,
                     nama_produk,
+                    kategori,
                     deskripsi_produk,
                     harga_modal,
                     harga_jual,
-                    jumlah_stok,
-                    gudang_id
+                    gudang_id,
+                    jumlah_stok
                 }
 
                 formData.append('data', JSON.stringify(data));
@@ -186,13 +165,6 @@ class ProductAdmin extends React.Component {
         }
     }
 
-    btAddImage = () => {
-        let temp = this.state.images
-        temp.push("")
-        this.setState({ images: temp })
-    }
-
-
     onBtImageUpload = (e) => {
         if (e.target.files[0]) {
             this.setState({ fileName: e.target.files[0].name, fileUpload: e.target.files[0] });
@@ -207,7 +179,7 @@ class ProductAdmin extends React.Component {
 
     btHandleSearch = (nama_produk) => {
         let products = this.state
-        
+
     }
 
 
@@ -215,7 +187,7 @@ class ProductAdmin extends React.Component {
         let { modal, modalEdit, products, selectedIndex } = this.state;
 
         return (
-            <div className="container p-4" style={{ fontFamily: "poppins", fontSize: "15px" }}>
+            <div className="p-4" style={{ fontFamily: "poppins", fontSize: "15px" }}>
                 <h3 className="text-center" style={{ fontWeight: "bolder" }}>Products Management</h3>
                 <br />
                 <input type="text" placeholder='cari produk' onChange={this.btSearch} />
@@ -232,59 +204,64 @@ class ProductAdmin extends React.Component {
                     <ModalBody>
                         <div className="row">
                             <div className="form-group col-6">
-                                <label>kategori_id</label>
-                                <select className="form-control" ref="kategoriid">
-                                    <option value={null}>Pilih kategori</option>
-                                    <option value="Electronic">Electronic</option>
-                                    <option value="Accesories">Accesories</option>
-                                    <option value="Connectivity">Connectivity</option>
-                                </select>
+                                <label>Produk</label>
+                                <input type="text" className="form-control" ref="namaproduk" />
                             </div>
                             <div className="form-group col-6">
-                                <label>nama_produk</label>
-                                <input type="text" className="form-control" ref="namaproduk" />
+                                <label>Kategori</label>
+                                <select className="form-control" ref="kategoriid">
+                                    <option value={null}>Pilih kategori</option>
+                                    <option value="Aksesoris Wanita">Aksesoris Wanita</option>
+                                    <option value="Aksesoris Pria">Aksesoris Pria</option>
+                                    <option value="Aksesoris Komputer">Aksesoris Komputer</option>
+                                    <option value="Pakaian">Pakaian</option>
+                                </select>
                             </div>
                             <div className="col-6">
                                 <div className="form-group">
-                                    <label>deskripsi_produk</label>
+                                    <label>Deskripsi</label>
                                     <input type="text" className="form-control" ref="deskripsiproduk" />
                                 </div>
                             </div>
                             <div className="col-6">
                                 <div className="form-group">
-                                    <label>harga_modal</label>
+                                    <label>Harga Modal</label>
                                     <input type="text" className="form-control" ref="hargamodal" />
                                 </div>
                             </div>
                             <div className="col-6">
                                 <div className="form-group">
-                                    <label>harga_jual</label>
+                                    <label>Harga Jual</label>
                                     <input type="text" className="form-control" ref="hargajual" />
                                 </div>
                             </div>
                             <div className="col-6">
                                 <div className="form-group">
-                                    <label>jumlah_stok</label>
+                                    <label>Jumlah</label>
                                     <input type="text" className="form-control" ref="jumlahstok" />
                                 </div>
                             </div>
                             <div className="col-6">
                                 <div className="form-group">
-                                    <label>gudang_id</label>
+                                    <label>Gudang</label>
                                     <select className="form-control" ref="gudangid">
                                         <option value={null}>Pilih gudang</option>
-                                        <option value="BSD">BSD</option>
-                                        <option value="Jakarta">Jakarta</option>
+                                        <option value="1">1</option>
+                                        <option value="2">2</option>
                                     </select>
+                                </div>
+                            </div>
+                            <div className="col-6">
+                                <div className="form-group">
+                                    <label>Notes Gudang</label>
+                                    <div>1. BSD, 2. Jakarta</div>
                                 </div>
                             </div>
                         </div>
                         <hr />
                         <div style={{ display: "flex", justifyContent: "space-between" }}>
                             <Label>Images List</Label>
-                            {/* <Button type="button" outline color="warning" size="sm" onClick={this.btAddImage}>Add Image</Button> */}
                         </div>
-                        {/* {this.printImagesForm()} */}
                         <div className="row">
                             <div className="col-md-6 text-center">
                                 <img
@@ -309,58 +286,65 @@ class ProductAdmin extends React.Component {
                             <ModalBody>
                                 <div className="row">
                                     <div className="form-group col-6">
-                                        <label>kategori_id</label>
-                                        <select className="form-control" ref="editKategoriid" defaultValue={products[selectedIndex].kategori_id}>
-                                            <option value={null}>Pilih kategori</option>
-                                            <option value="Electronic">Electronic</option>
-                                            <option value="Accesories">Accesories</option>
-                                            <option value="Connectivity">Connectivity</option>
-                                        </select>
+                                        <label>Produk</label>
+                                        <input type="text" className="form-control" ref="namaproduk" defaultValue={products[selectedIndex].nama_produk} />
                                     </div>
                                     <div className="form-group col-6">
-                                        <label>nama_produk</label>
-                                        <input type="text" className="form-control" ref="editNamaproduk" defaultValue={products[selectedIndex].nama_produk} />
-                                    </div>
-                                </div>
-                                <div className="col-6">
-                                    <div className="form-group">
-                                        <label>deskripsi_produk</label>
-                                        <input type="text" className="form-control" ref="editDeskripsiproduk" defaultValue={products[selectedIndex].deskripsi_produk} />
-                                    </div>
-                                </div>
-                                <div className="col-6">
-                                    <div className="form-group">
-                                        <label>harga_modal</label>
-                                        <input type="text" className="form-control" ref="editHargamodal" defaultValue={products[selectedIndex].harga_modal} />
-                                    </div>
-                                </div>
-                                <div className="col-6">
-                                    <div className="form-group">
-                                        <label>harga_jual</label>
-                                        <input type="text" className="form-control" ref="editHargajual" defaultValue={products[selectedIndex].harga_jual} />
-                                    </div>
-                                </div>
-                                <div className="col-6">
-                                    <div className="form-group">
-                                        <label>jumlah_stok</label>
-                                        <input type="text" className="form-control" ref="editJumlahstok" defaultValue={products[selectedIndex].jumlah_stok} />
-                                    </div>
-                                </div>
-                                <div className="col-6">
-                                    <div className="form-group">
-                                        <label>gudang_id</label>
-                                        <select className="form-control" ref="editGudangid" defaultValue={products[selectedIndex].gudang_id}>
-                                            <option value={null}>Pilih gudang</option>
-                                            <option value="BSD">BSD</option>
-                                            <option value="Jakarta">Jakarta</option>
+                                        <label>Kategori</label>
+                                        <select className="form-control" ref="kategoriid" defaultValue={products[selectedIndex].kategori}>
+                                            <option value={null}>Pilih kategori</option>
+                                            <option value="Aksesoris Wanita">Aksesoris Wanita</option>
+                                            <option value="Aksesoris Pria">Aksesoris Pria</option>
+                                            <option value="Aksesoris Komputer">Aksesoris Komputer</option>
+                                            <option value="Pakaian">Pakaian</option>
                                         </select>
                                     </div>
+                                    <div className="col-6">
+                                        <div className="form-group">
+                                            <label>Deskripsi</label>
+                                            <input type="text" className="form-control" ref="deskripsiproduk" defaultValue={products[selectedIndex].deskripsi_produk} />
+                                        </div>
+                                    </div>
+                                    <div className="col-6">
+                                        <div className="form-group">
+                                            <label>Harga Modal</label>
+                                            <input type="text" className="form-control" ref="hargamodal" defaultValue={products[selectedIndex].harga_modal} />
+                                        </div>
+                                    </div>
+                                    <div className="col-6">
+                                        <div className="form-group">
+                                            <label>Harga Jual</label>
+                                            <input type="text" className="form-control" ref="hargajual" defaultValue={products[selectedIndex].harga_jual} />
+                                        </div>
+                                    </div>
+                                    <div className="col-6">
+                                        <div className="form-group">
+                                            {/* <label>Jumlah</label>
+                                            <input type="text" className="form-control" ref="jumlahstok" /> */}
+                                        </div>
+                                    </div>
+                                    {/* <div className="col-6">
+                                        <div className="form-group">
+                                            <label>Gudang</label>
+                                            <select className="form-control" ref="gudangid">
+                                                <option value={null}>Pilih gudang</option>
+                                                <option value="1">1</option>
+                                                <option value="2">2</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div className="col-6">
+                                        <div className="form-group">
+                                            <label>Notes Gudang</label>
+                                            <div>1. BSD, 2. Jakarta</div>
+                                        </div>
+                                    </div> */}
                                 </div>
                                 <hr />
-                                <div style={{ display: "flex", justifyContent: "space-between" }}>
+                                {/* <div style={{ display: "flex", justifyContent: "space-between" }}>
                                     <Label>Images List</Label>
-                                </div>
-                                {this.printImagesEdit()}
+                                </div> */}
+                                {/* {this.printImagesEdit()} */}
                             </ModalBody>
                             <ModalFooter >
                                 <Button type="button" outline color="warning" onClick={() => this.setState({ modalEdit: !modalEdit, selectedIndex: null, imagesEdit: [] })}>Cancel</Button>
@@ -381,7 +365,6 @@ class ProductAdmin extends React.Component {
                             <th>Harga Modal</th>
                             <th>Harga Jual</th>
                             <th>Stok</th>
-                            <th>Gudang</th>
                             <th>Action</th>
                         </tr>
                     </thead>
