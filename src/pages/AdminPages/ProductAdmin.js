@@ -190,8 +190,8 @@ class ProductAdmin extends React.Component {
             <div className="p-4" style={{ fontFamily: "poppins", fontSize: "15px" }}>
                 <h3 className="text-center" style={{ fontWeight: "bolder" }}>Products Management</h3>
                 <br />
-                <input type="text" placeholder='cari produk' onChange={this.btSearch} />
-                <button onClick={() => this.btHandleSearch()}>Search</button>
+                {/* <input type="text" placeholder='cari produk' onChange={this.btSearch} />
+                <button onClick={() => this.btHandleSearch()}>Search</button> */}
                 <div style={{ display: "flex", justifyContent: "flex-end" }}>
                     <Button color="success" outline type="button" onClick={() => this.setState({ modal: !modal })}>
                         Add Product
